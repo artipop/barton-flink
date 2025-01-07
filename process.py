@@ -1,13 +1,13 @@
 import argparse
 import sys
 
-from pyflink.common import Encoder, Duration, Types
+from pyflink.common import Encoder, Duration, Types, Time
 from pyflink.datastream import StreamExecutionEnvironment, RuntimeExecutionMode
 from pyflink.datastream.connectors.file_system import FileSink, OutputFileConfig, \
     RollingPolicy
 from pyflink.datastream.window import SlidingEventTimeWindows
 
-from test_util import generate_audio_stream
+from test_util import generate_audio_stream_mp3
 from vad.vad_process_windows import SileroVadProcessWindowFunction
 
 
@@ -17,9 +17,12 @@ def vad_processing(input_path: str, output_path: str):
     # write all the data to one file
     env.set_parallelism(1)
 
+    # for chunk in generate_audio_stream_mp3(input_path):
+    #     print(chunk)
+
     # define the source
     ds = env.from_collection(
-        [(chunk,) for chunk in generate_audio_stream(input_path)],
+        [(chunk,) for chunk in generate_audio_stream_mp3(input_path)],
         type_info=Types.TUPLE([Types.LIST(Types.INT())])
     )
 
@@ -41,13 +44,13 @@ def vad_processing(input_path: str, output_path: str):
 
     ds \
         .key_by(lambda x: 0) \
-        .window(SlidingEventTimeWindows.of(Duration.of_millis(1000), Duration.of_millis(500))) \
+        .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5))) \
         .reduce(function) \
         .map(lambda x: print(x))
 
     (ds
      .key_by(lambda x: 0)
-     .window(SlidingEventTimeWindows.of(Duration.of_millis(1000), Duration.of_millis(500)))
+     .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5)))
      # or
      # .window(TumblingProcessingTimeWindows.of(Time.milliseconds(window_size_ms)))
      .process(SileroVadProcessWindowFunction()))
@@ -90,4 +93,5 @@ if __name__ == '__main__':
     argv = sys.argv[1:]
     known_args, _ = parser.parse_known_args(argv)
 
-    vad_processing(known_args.input, known_args.output)
+    an_input = '/Users/artem/dev/outsource/flink/barton-flink/vidal.mp3'  # known_args.input
+    vad_processing(an_input, known_args.output)
