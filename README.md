@@ -5,7 +5,7 @@
 - Install python
 - Create venv and install required packages
   - `pip install apache-flink`
-  - `pip install silero-vad` and `pip install soundfile` (needed for audio I/O)
+  - `pip install silero-vad` and `pip install soundfile` (needed for audio I/O, see other [options](https://github.com/snakers4/silero-vad/wiki/Examples-and-Dependencies#dependencies))
   - depending on the system
     - for macOS: `WHISPER_COREML=1 pip install git+https://github.com/absadiki/pywhispercpp`
     - for Nvidia GPU: `GGML_CUDA=1 pip install git+https://github.com/absadiki/pywhispercpp`

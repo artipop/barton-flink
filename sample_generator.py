@@ -1,11 +1,10 @@
 import wave
 from typing import Any
 
+import numpy as np
+import soundfile as sf
 from numpy import ndarray, dtype
 from pydub import AudioSegment
-import numpy as np
-import torch
-import soundfile as sf
 
 
 def generate_audio_stream_mp3(file_path, chunk_duration_ms=100):
