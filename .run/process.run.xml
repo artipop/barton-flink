@@ -15,7 +15,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="src/process.py" />
-    <option name="PARAMETERS" value="--input=$PROJECT_DIR$/test/resources/vidal.wav" />
+    <option name="PARAMETERS" value="--input=$PROJECT_DIR$/test/resources/out.wav" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

@@ -3,6 +3,7 @@ from typing import Tuple
 import numpy
 import numpy as np
 import torch
+import torch.nn.functional as f
 from pyflink.common import Types
 from pyflink.datastream import MapFunction, KeyedProcessFunction, RuntimeContext
 from pyflink.datastream.state import ListStateDescriptor
@@ -32,9 +33,10 @@ class SpeechToTextMapFunction(MapFunction):
         arr = value[0]  # (512,)  # Tuple[numpy.ndarray]
         chunk = torch.from_numpy(arr)
         if len(chunk) < self.sample_size:
-            # we can pad the last chunk, or we can signal that it's the end of the record and break the loop
-            # chunk = f.pad(chunk, (0, 512 - chunk.size(dim=0)))
-            return
+            # we can pad the last chunk
+            chunk = f.pad(chunk, (0, self.sample_size - chunk.size(dim=0)))
+            # or we can signal that it's the end of the record and break the loop
+            # return
         speech_dict = self.vad_iterator(chunk)
         if speech_dict:
             if 'start' in speech_dict:

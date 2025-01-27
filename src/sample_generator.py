@@ -62,9 +62,13 @@ def audio_samples_generator(file_path, chunk_size=1024):
 
 
 def read_audio_in_chunks(file_path, chunk_size):
-    with sf.SoundFile(file_path, 'r') as audio_file:
+    with sf.SoundFile(file_path, mode='r') as audio_file:
         while True:
             data = audio_file.read(chunk_size, dtype='float32')
+            # data, sr = audio_file.read(chunk_size, dtype='float32')
+            # if np.ndim(data) > 1:
+            #     data = np.mean(data, axis=0)
+            # if len(data) == 0:
             if len(data) == 0:
                 break
             yield data

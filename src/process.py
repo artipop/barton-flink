@@ -25,7 +25,7 @@ def audio_processing(input_path: str, output_path: str):
     else:
         raise Exception("Unsupported file type")
     ds = env.from_collection(
-        [(chunk,) for chunk in generator],
+        [(chunk,) for chunk in read_audio_in_chunks(input_path, 512)],
         # type_info=Types.TUPLE([Types.PRIMITIVE_ARRAY(Types.INT())])
     )
     (ds
