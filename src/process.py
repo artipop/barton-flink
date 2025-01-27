@@ -9,7 +9,8 @@ from pyflink.datastream.connectors.file_system import FileSink, OutputFileConfig
 from pyflink.datastream.window import SlidingEventTimeWindows
 
 from fns import SpeechToTextMapFunction
-from sample_generator import generate_audio_stream_mp3, read_audio_in_chunks
+from sample_generator import generate_audio_stream_mp3, read_audio_in_chunks, audio_samples_generator, \
+    generate_audio_stream
 
 
 def audio_processing(input_path: str, output_path: str):
@@ -39,15 +40,15 @@ def audio_processing(input_path: str, output_path: str):
 
     env.execute()
 
-    (ds
-     .key_by(lambda x: 0)
-     .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5)))
-     # or
-     # .window(TumblingProcessingTimeWindows.of(Time.milliseconds(window_size_ms)))
-     # .process(SileroVadProcessWindowFunction())
-     # or
-     # .map(SileroVadMapFunction())
-     )
+    # (ds
+    #  .key_by(lambda x: 0)
+    #  .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5)))
+    #  # or
+    #  # .window(TumblingProcessingTimeWindows.of(Time.milliseconds(window_size_ms)))
+    #  # .process(SileroVadProcessWindowFunction())
+    #  # or
+    #  # .map(SileroVadMapFunction())
+    #  )
 
     # send processing result to output file or stdout
     if output_path is not None:
@@ -63,11 +64,11 @@ def audio_processing(input_path: str, output_path: str):
             .with_rolling_policy(RollingPolicy.default_rolling_policy())
             .build()
         )
-    else:
-        print("Printing result to stdout. Use --output to specify output path.")
-        ds.print()
+    # else:
+        # print("Printing result to stdout. Use --output to specify output path.")
+        # ds.print()
 
-    env.execute()
+    # env.execute()
 
 
 if __name__ == '__main__':

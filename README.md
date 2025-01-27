@@ -1,8 +1,8 @@
 # Captain Flink
 
 ## How to run
-- Install Java
-- Install python
+- Install Java (version 11 is the [recommended one](https://nightlies.apache.org/flink/flink-docs-release-1.20/docs/deployment/java_compatibility/))
+- Install Python (3.11)
 - Create venv and install required packages
   - `pip install apache-flink`
   - `pip install silero-vad` and `pip install soundfile` (needed for audio I/O, see other [options](https://github.com/snakers4/silero-vad/wiki/Examples-and-Dependencies#dependencies))
