@@ -6,10 +6,9 @@ import torch
 from pyflink.common import Types
 from pyflink.datastream import MapFunction, KeyedProcessFunction, RuntimeContext
 from pyflink.datastream.state import ListStateDescriptor
-from pywhispercpp.model import Model
 from silero_vad import VADIterator
 
-from models import vad_model
+from models import vad_model, whisper_model
 
 
 class SpeechToTextMapFunction(MapFunction):
@@ -24,7 +23,7 @@ class SpeechToTextMapFunction(MapFunction):
     def open(self, runtime_context: RuntimeContext):
         self.vad_iterator = VADIterator(vad_model, sampling_rate=self.sampling_rate,
                                         min_silence_duration_ms=1000)  # , speech_pad_ms=1000)
-        self.whisper_model = Model('base.en')
+        self.whisper_model = whisper_model
         self.buffer_state = runtime_context.get_list_state(
             ListStateDescriptor("buffer", Types.LIST(Types.FLOAT()))
         )
@@ -66,7 +65,7 @@ class SpeechToTextProcessFunction(KeyedProcessFunction):
     def open(self, runtime_context: RuntimeContext):
         self.vad_iterator = VADIterator(vad_model, sampling_rate=self.sampling_rate,
                                         min_silence_duration_ms=1000)  # , speech_pad_ms=1000)
-        self.whisper_model = Model('base.en')
+        self.whisper_model = whisper_model
         self.buffer_state = runtime_context.get_list_state(
             ListStateDescriptor("buffer", Types.LIST(Types.FLOAT()))
         )
