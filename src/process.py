@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+import time
 
 from pyflink.common import Encoder, Time
 from pyflink.datastream import StreamExecutionEnvironment, RuntimeExecutionMode
@@ -10,7 +11,7 @@ from pyflink.datastream.window import SlidingEventTimeWindows
 
 from fns import SpeechToTextMapFunction
 from sample_generator import generate_audio_stream_mp3, read_audio_in_chunks, audio_samples_generator, \
-    generate_audio_stream
+    generate_audio_stream, DelayedSource, DelayedFlatMapFunction
 
 
 def audio_processing(input_path: str, output_path: str):
@@ -25,11 +26,12 @@ def audio_processing(input_path: str, output_path: str):
     else:
         raise Exception("Unsupported file type")
     ds = env.from_collection(
-        [(chunk,) for chunk in read_audio_in_chunks(input_path, 512)],
+        [(chunk,) for chunk in generator],
         # type_info=Types.TUPLE([Types.PRIMITIVE_ARRAY(Types.INT())])
     )
     (ds
      .key_by(lambda x: 0)
+     # .flat_map(DelayedFlatMapFunction(512, 16000))
      .map(SpeechToTextMapFunction()))
 
     # ds.set_buffer_timeout()  # ???
@@ -38,7 +40,10 @@ def audio_processing(input_path: str, output_path: str):
     #             .with_timestamp_assigner(timestamp_assigner=SimpleTimestampAssigner()))
     # ds.assign_timestamps_and_watermarks(assigner)
 
+    start_time = time.time()
     env.execute()
+    end_time = time.time()
+    print(f"execution time in seconds: {end_time - start_time:.6f}")
 
     # (ds
     #  .key_by(lambda x: 0)

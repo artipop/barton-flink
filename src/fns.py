@@ -1,3 +1,4 @@
+import time
 from typing import Tuple
 
 import numpy
@@ -51,6 +52,9 @@ class SpeechToTextMapFunction(MapFunction):
                 self.buffer_state.clear()
         if self.buffer_state_updated:
             self.buffer_state.add(chunk.numpy().tolist())
+        chunk_duration = self.sample_size / self.sampling_rate
+        time.sleep(chunk_duration)
+        # print(chunk_duration)
         return ""  # transformed value
 
 
