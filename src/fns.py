@@ -47,9 +47,14 @@ class SpeechToTextMapFunction(MapFunction):
                 buffer = self.buffer_state.get()
                 numpy_arrays = [np.array(arr, dtype=np.float32) for arr in buffer]
                 np_arr = np.concatenate(numpy_arrays)
+                print('send to whisper')
+                start_time = time.time()
                 segments = self.whisper_model.transcribe(np_arr, new_segment_callback=print)
+                end_time = time.time()
+                print(f"release from whisper {end_time - start_time:.6f}")
                 self.buffer_state_updated = False
                 self.buffer_state.clear()
+                return segments
         if self.buffer_state_updated:
             self.buffer_state.add(chunk.numpy().tolist())
         chunk_duration = self.sample_size / self.sampling_rate
@@ -70,7 +75,7 @@ class SpeechToTextProcessFunction(KeyedProcessFunction):
 
     def open(self, runtime_context: RuntimeContext):
         self.vad_iterator = VADIterator(vad_model, sampling_rate=self.sampling_rate,
-                                        min_silence_duration_ms=1000)  # , speech_pad_ms=1000)
+                                        min_silence_duration_ms=500)  # , speech_pad_ms=1000)
         self.whisper_model = whisper_model
         self.buffer_state = runtime_context.get_list_state(
             ListStateDescriptor("buffer", Types.LIST(Types.FLOAT()))
