@@ -21,6 +21,9 @@ class SpeechToTextMapFunction(MapFunction):
         self.vad_iterator = None
         self.sampling_rate = 16000
         self.sample_size = 512
+        # №
+        self.start_collect = time.time()
+        self.end_collect = time.time()
 
     def open(self, runtime_context: RuntimeContext):
         self.vad_iterator = VADIterator(vad_model, sampling_rate=self.sampling_rate,
@@ -41,13 +44,16 @@ class SpeechToTextMapFunction(MapFunction):
         speech_dict = self.vad_iterator(chunk)
         if speech_dict:
             if 'start' in speech_dict:
+                self.start_collect = time.time()
                 self.buffer_state.add(chunk.numpy().tolist())
                 self.buffer_state_updated = True
             elif 'end' in speech_dict:
                 buffer = self.buffer_state.get()
                 numpy_arrays = [np.array(arr, dtype=np.float32) for arr in buffer]
                 np_arr = np.concatenate(numpy_arrays)
-                print('send to whisper')
+                self.end_collect = time.time()
+                print(f"vad and buffer collection {self.end_collect - self.start_collect:.6f}")
+                # print('send to whisper')
                 start_time = time.time()
                 segments = self.whisper_model.transcribe(np_arr, new_segment_callback=print)
                 end_time = time.time()
