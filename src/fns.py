@@ -52,12 +52,13 @@ class SpeechToTextMapFunction(MapFunction):
                 numpy_arrays = [np.array(arr, dtype=np.float32) for arr in buffer]
                 np_arr = np.concatenate(numpy_arrays)
                 self.end_collect = time.time()
-                print(f"vad and buffer collection {self.end_collect - self.start_collect:.6f}")
+                print(f"buf {self.end_collect - self.start_collect:.6f}")
                 # print('send to whisper')
                 start_time = time.time()
-                segments = self.whisper_model.transcribe(np_arr, new_segment_callback=print)
+                segments = self.whisper_model.transcribe(np_arr)
                 end_time = time.time()
-                print(f"release from whisper {end_time - start_time:.6f}")
+                print(f"whisper {end_time - start_time:.6f}")
+                # print(segments)
                 self.buffer_state_updated = False
                 self.buffer_state.clear()
                 return segments
